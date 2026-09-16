@@ -5,6 +5,7 @@
 #include "duckdb.hpp"
 #include "duckdb/common/exception/parser_exception.hpp"
 #include "duckdb/main/config.hpp"
+#include "duckdb/main/settings.hpp"
 #include "duckdb/parser/parser.hpp"
 #include "duckdb/parser/parser_extension.hpp"
 #include "duckdb/parser/statement/create_statement.hpp"
@@ -90,8 +91,14 @@ public:
 };
 
 static void LoadInternal(ExtensionLoader &loader) {
-	auto &config = DBConfig::GetConfig(loader.GetDatabaseInstance());
+	auto &db = loader.GetDatabaseInstance();
+	auto &config = DBConfig::GetConfig(db);
 	ParserExtension::Register(config, LegacyParserExtensionHook());
+	// Loading this extension means "parse like 1.5": make the legacy grammar the parser, without PEG fallback,
+	// unless the override mode was chosen explicitly before the load
+	if (Settings::Get<AllowParserOverrideExtensionSetting>(db) == AllowParserOverride::DEFAULT_OVERRIDE) {
+		config.SetOptionByName(Identifier("allow_parser_override_extension"), Value("strict"));
+	}
 	loader.RegisterFunction(ScalarFunction("legacy_parser_stats", {}, LogicalType::VARCHAR, LegacyParserStats));
 }
 
