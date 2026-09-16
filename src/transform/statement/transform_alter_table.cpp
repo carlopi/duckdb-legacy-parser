@@ -126,7 +126,9 @@ unique_ptr<SQLStatement> Transformer::TransformAlter(duckdb_libpgquery::PGAlterT
 			column_entry.SetName(column_names.back());
 			if (column_names.size() == 1) {
 				// ADD COLUMN
-				if (!column_entry.HasDefaultValue() ||
+				// IF NOT EXISTS keeps the single-statement path: the multi-statement rewrite would re-apply the
+				// default to an existing column
+				if (command->missing_ok || !column_entry.HasDefaultValue() ||
 				    column_entry.DefaultValue().GetExpressionClass() == ExpressionClass::CONSTANT) {
 					result->info =
 					    make_uniq<AddColumnInfo>(std::move(data), std::move(column_entry), command->missing_ok, false);
