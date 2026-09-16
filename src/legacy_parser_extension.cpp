@@ -21,9 +21,30 @@ namespace duckdb {
 static std::atomic<idx_t> legacy_parsed_count {0};
 static std::atomic<idx_t> legacy_declined_count {0};
 
+struct LegacyParserInfo : public ParserExtensionInfo {
+	explicit LegacyParserInfo(DatabaseInstance &db_p) : db(db_p) {
+	}
+	DatabaseInstance &db;
+};
+
+static constexpr const char *DISABLE_OPTION = "disable_legacy_parser";
+
+//! The extension's own off switch: when set, every query is declined and the built-in parser handles it
+static bool LegacyParserDisabled(DatabaseInstance &db) {
+	Value value;
+	auto &config = DBConfig::GetConfig(db);
+	if (!config.TryGetCurrentSetting(Identifier(DISABLE_OPTION), value)) {
+		return false;
+	}
+	return !value.IsNull() && BooleanValue::Get(value);
+}
+
 //! Parses a query with the 1.5 Postgres-derived grammar and transformer.
 //! Returns DISPLAY_ORIGINAL_ERROR when the grammar rejects the query, so that the PEG parser takes over.
-static ParserOverrideResult LegacyParse(ParserExtensionInfo *, const string &query_p, ParserOptions &options) {
+static ParserOverrideResult LegacyParse(ParserExtensionInfo *info, const string &query_p, ParserOptions &options) {
+	if (LegacyParserDisabled(info->Cast<LegacyParserInfo>().db)) {
+		return ParserOverrideResult();
+	}
 	string query = query_p;
 	{
 		string stripped;
@@ -85,15 +106,19 @@ static void LegacyParserStats(DataChunk &args, ExpressionState &state, Vector &r
 
 class LegacyParserExtensionHook : public ParserExtension {
 public:
-	LegacyParserExtensionHook() {
+	explicit LegacyParserExtensionHook(DatabaseInstance &db) {
 		parser_override = LegacyParse;
+		parser_info = make_shared_ptr<LegacyParserInfo>(db);
 	}
 };
 
 static void LoadInternal(ExtensionLoader &loader) {
 	auto &db = loader.GetDatabaseInstance();
 	auto &config = DBConfig::GetConfig(db);
-	ParserExtension::Register(config, LegacyParserExtensionHook());
+	ParserExtension::Register(config, LegacyParserExtensionHook(db));
+	config.AddExtensionOption(Identifier(DISABLE_OPTION),
+	                          "Switches the legacy parser off without unloading it: every query goes to the built-in parser",
+	                          LogicalType::BOOLEAN, Value::BOOLEAN(false), nullptr, SetScope::GLOBAL);
 	// Loading this extension means "parse like 1.5": make the legacy grammar the parser, without PEG fallback,
 	// unless the override mode was chosen explicitly before the load
 	if (Settings::Get<AllowParserOverrideExtensionSetting>(db) == AllowParserOverride::DEFAULT_OVERRIDE) {

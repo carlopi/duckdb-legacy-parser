@@ -63,6 +63,33 @@ statement error
 ----
 syntax error at or near "1"
 
+# the extension's own switch: off means the built-in parser, without touching the parser options
+statement ok
+SET disable_legacy_parser = true
+
+query I
+SELECT current_setting('allow_parser_override_extension')
+----
+strict
+
+query I
+1 + 1
+----
+2
+
+query I
+SELECT legacy_parser_stats()
+----
+parsed=11 declined=2
+
+statement ok
+SET disable_legacy_parser = false
+
+statement error
+1 + 1
+----
+syntax error at or near "1"
+
 # fallback mode hands what the legacy grammar rejects to the PEG parser
 statement ok
 SET allow_parser_override_extension='fallback'
@@ -75,7 +102,7 @@ query I
 query I
 SELECT legacy_parser_stats()
 ----
-parsed=12 declined=3
+parsed=13 declined=4
 
 statement error
 SELEC 1
@@ -89,4 +116,4 @@ SET allow_parser_override_extension='default'
 query I
 SELECT legacy_parser_stats()
 ----
-parsed=13 declined=4
+parsed=14 declined=5
