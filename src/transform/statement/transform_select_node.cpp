@@ -22,7 +22,8 @@ void Transformer::TransformModifiers(duckdb_libpgquery::PGSelectStmt &stmt, Quer
 
 	if (stmt.limitCount || stmt.limitOffset) {
 		if (stmt.limitCount && stmt.limitCount->type == duckdb_libpgquery::T_PGLimitPercent) {
-			auto limit_percent_modifier = make_uniq<LegacyLimitPercentModifier>();
+			auto limit_percent_modifier = make_uniq<LimitModifier>();
+			limit_percent_modifier->limit_type = LimitValueType::PERCENTAGE;
 			auto expr_node = PGPointerCast<duckdb_libpgquery::PGLimitPercent>(stmt.limitCount)->limit_percent;
 			limit_percent_modifier->limit = TransformExpression(expr_node);
 			if (stmt.limitOffset) {
