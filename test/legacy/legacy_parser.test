@@ -10,6 +10,11 @@ SELECT 42
 ----
 42
 
+query I
+SELECT legacy_parser_stats()
+----
+parsed=0 declined=0
+
 statement ok
 SET allow_parser_override_extension='fallback'
 
@@ -45,11 +50,22 @@ EXECUTE p(1)
 ----
 1
 
-# a syntax error falls through to the PEG parser, which reports it
+# syntax only the PEG parser knows falls through to it
+query I
+1 + 1
+----
+2
+
+query I
+SELECT legacy_parser_stats()
+----
+parsed=8 declined=1
+
+# a syntax error falls through to the PEG parser, which reports it in its own words
 statement error
 SELEC 1
 ----
-Parser Error
+syntax error at or near "1"
 
 # in strict mode the legacy parser's own error is reported
 statement ok
@@ -57,5 +73,11 @@ SET allow_parser_override_extension='strict'
 
 statement error
 SELEC 1
+----
+syntax error at or near "SELEC"
+
+# and PEG-only syntax is rejected outright
+statement error
+1 + 1
 ----
 syntax error at or near "1"
