@@ -24,6 +24,9 @@ unique_ptr<ExplainStatement> Transformer::TransformExplain(duckdb_libpgquery::PG
 			if (elem == "analyze") {
 				explain_type = ExplainType::EXPLAIN_ANALYZE;
 			} else if (elem == "format") {
+				if (!def_elem->arg) {
+					throw InvalidInputException("FORMAT requires a single format name, e.g. FORMAT json");
+				}
 				if (def_elem->arg) {
 					if (format_is_set) {
 						throw InvalidInputException("FORMAT can not be provided more than once");
