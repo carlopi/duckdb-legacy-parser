@@ -1,5 +1,369 @@
 {
   "description": "legacy_parser loaded: the 1.5 grammar is the parser, no PEG fallback (strict).",
-  "statically_loaded_extensions": ["core_functions", "legacy_parser"],
-  "skip_compiled": "true"
+  "statically_loaded_extensions": [
+    "core_functions",
+    "legacy_parser"
+  ],
+  "skip_compiled": "true",
+  "skip_tests": [
+    {
+      "reason": "CREATE TRIGGER (2.0 syntax)",
+      "paths": [
+        "test/sql/catalog/nested_schema/nested_entries.test",
+        "test/sql/catalog/nested_schema/nested_entries_persist.test",
+        "test/sql/merge/trigger_merge_into.test",
+        "test/sql/trigger/create_trigger_catalog.test",
+        "test/sql/trigger/create_trigger_parse.test",
+        "test/sql/trigger/create_trigger_wal.test",
+        "test/sql/trigger/drop_trigger.test",
+        "test/sql/trigger/drop_trigger_wal.test",
+        "test/sql/trigger/temporary_trigger.test",
+        "test/sql/trigger/trigger_after_delete.test",
+        "test/sql/trigger/trigger_after_delete_referencing.test",
+        "test/sql/trigger/trigger_after_insert.test",
+        "test/sql/trigger/trigger_after_insert_referencing.test",
+        "test/sql/trigger/trigger_after_update.test",
+        "test/sql/trigger/trigger_after_update_old_new.test",
+        "test/sql/trigger/trigger_after_update_old_new_wal.test",
+        "test/sql/trigger/trigger_after_update_referencing.test",
+        "test/sql/trigger/trigger_alter_table.test",
+        "test/sql/trigger/trigger_before_after_mixed.test",
+        "test/sql/trigger/trigger_before_delete.test",
+        "test/sql/trigger/trigger_before_insert.test",
+        "test/sql/trigger/trigger_before_update.test",
+        "test/sql/trigger/trigger_concurrent_rename.test",
+        "test/sql/trigger/trigger_dependency.test",
+        "test/sql/trigger/trigger_dependency_restart.test",
+        "test/sql/trigger/trigger_for_each_row.test",
+        "test/sql/trigger/trigger_multiple_per_event.test",
+        "test/sql/trigger/trigger_referencing_validation.test",
+        "test/sql/trigger/trigger_returning.test",
+        "test/sql/trigger/trigger_returning_binder_parity.test",
+        "test/sql/trigger/trigger_update_from_multi_match.test"
+      ]
+    },
+    {
+      "reason": "error wording differs",
+      "paths": [
+        "test/sql/attach/attach_issue_21491.test",
+        "test/sql/catalog/comment_on_extended.test",
+        "test/sql/catalog/sequence/test_sequence.test",
+        "test/sql/connect/connect_string_ephemeral.test",
+        "test/sql/connect/connect_syntax.test",
+        "test/sql/constraints/deferred/test_constraint_timing_storage_version.test",
+        "test/sql/constraints/deferred/test_deferred_syntax.test",
+        "test/sql/error/error_location_multicaret.test",
+        "test/sql/export/export_database.test",
+        "test/sql/function/operator/test_comparison.test",
+        "test/sql/function/timetz/test_date_part.test",
+        "test/sql/parser/statement_tostring_roundtrip.test",
+        "test/sql/parser/values_list_error.test",
+        "test/sql/peg_parser/escape_string.test",
+        "test/sql/peg_parser/fuzzer/diverge_0002.test",
+        "test/sql/peg_parser/fuzzer/diverge_0004.test",
+        "test/sql/peg_parser/fuzzer/diverge_0020.test",
+        "test/sql/peg_parser/fuzzer/fuzzer_4434.test",
+        "test/sql/peg_parser/fuzzer/internal_0206.test",
+        "test/sql/peg_parser/fuzzer/internal_0208.test",
+        "test/sql/peg_parser/fuzzer/internal_0227.test",
+        "test/sql/peg_parser/peg_syntax_error.test",
+        "test/sql/peg_parser/unterminated_literals.test",
+        "test/sql/pivot/pivot_star.test",
+        "test/sql/types/numeric/float_precision.test",
+        "test/sql/types/struct/unnest_column_names.test",
+        "test/sql/types/timestamp/timestamp_precision.test",
+        "test/sql/types/type_constructor_error_location.test",
+        "test/sql/types/type_constructors.test",
+        "test/sql/update/test_multiple_assignment.test",
+        "test/sql/window/test_boundary_expr.test"
+      ]
+    },
+    {
+      "reason": "nested schemas and four-part names (2.0 capability)",
+      "paths": [
+        "test/sql/attach/attach_enums.test",
+        "test/sql/attach/attach_schema.test",
+        "test/sql/catalog/nested_schema/create_nested_schema.test",
+        "test/sql/catalog/nested_schema/deeply_nested_entries.test",
+        "test/sql/catalog/nested_schema/drop_nested_schema.test",
+        "test/sql/catalog/nested_schema/drop_nested_schema_persist.test",
+        "test/sql/catalog/nested_schema/nested_constraints.test",
+        "test/sql/catalog/nested_schema/nested_export.test",
+        "test/sql/catalog/nested_schema/nested_schema_storage_version.test",
+        "test/sql/catalog/nested_schema/nested_table_dml.test",
+        "test/sql/catalog/nested_schema/nested_wal_replay.test",
+        "test/sql/catalog/nested_schema/persist.test",
+        "test/sql/projection/select_star_exclude.test"
+      ]
+    },
+    {
+      "reason": "CREATE SECURE VIEW (2.0)",
+      "paths": [
+        "test/sql/catalog/view/secure_view.test",
+        "test/sql/catalog/view/secure_view_persistence.test",
+        "test/sql/optimizer/secure_view_explain.test",
+        "test/sql/optimizer/secure_view_pushdown.test",
+        "test/sql/optimizer/secure_view_pushdown_compression.test",
+        "test/sql/optimizer/secure_view_statistics.test"
+      ]
+    },
+    {
+      "reason": "ALTER TABLE ADD UNIQUE (2.0 capability)",
+      "paths": [
+        "test/sql/alter/add_pk/test_add_pk_wal_generated.test",
+        "test/sql/alter/add_unique/test_add_unique.test",
+        "test/sql/alter/add_unique/test_add_unique_wal.test",
+        "test/sql/constraints/deferred/test_alter_constraint_timing.test"
+      ]
+    },
+    {
+      "reason": "NEAREST joins (2.0 syntax)",
+      "paths": [
+        "test/sql/join/nearest/nearest_basic.test",
+        "test/sql/join/nearest/nearest_errors.test",
+        "test/sql/join/nearest/nearest_parser.test",
+        "test/sql/join/nearest/nearest_storage.test"
+      ]
+    },
+    {
+      "reason": "1.5 behaviour: ~ is a full regex match",
+      "paths": [
+        "test/sql/function/string/regex_operators.test",
+        "test/sql/function/string/regex_operators_v1_5_view.test",
+        "test/sql/function/string/test_similar_to.test"
+      ]
+    },
+    {
+      "reason": "1.5 rendering: built-in functions are qualified with main.",
+      "paths": [
+        "test/sql/parser/literal_round_trip.test",
+        "test/sql/parser/test_columns_unpacked.test",
+        "test/sql/types/test_quotes.test"
+      ]
+    },
+    {
+      "reason": "CREATE EXTENSION REPOSITORY (2.0 syntax)",
+      "paths": [
+        "test/sql/extensions/extension_repositories.test",
+        "test/sql/extensions/extension_repositories_lock.test",
+        "test/sql/extensions/extension_repository_not_autoloaded.test"
+      ]
+    },
+    {
+      "reason": "EXTERNAL RESOURCE statements (2.0 syntax)",
+      "paths": [
+        "test/sql/attach/external_resource_discovery.test",
+        "test/sql/attach/external_resource_statements.test",
+        "test/sql/parser/external_resource_roundtrip.test"
+      ]
+    },
+    {
+      "reason": "syntax only the PEG grammar has",
+      "paths": [
+        "test/sql/optimizer/in_list_row_group_pruning.test",
+        "test/sql/peg_parser/deep_nesting.test",
+        "test/sql/window/test_empty_frames.test"
+      ]
+    },
+    {
+      "reason": "syntax only the PEG grammar has (at or near \"ASC\")",
+      "paths": [
+        "test/sql/copy/partitioned/hive_partitioned_delayed_flush.test",
+        "test/sql/copy/partitioned/order_by_without_partition.test",
+        "test/sql/copy/partitioned/partitioned_order_by.test_slow"
+      ]
+    },
+    {
+      "reason": "1.5 behaviour: ADD COLUMN with constraints is rejected",
+      "paths": [
+        "test/sql/alter/add_col/test_add_col_constraints.test",
+        "test/sql/alter/add_col/test_add_col_not_null.test"
+      ]
+    },
+    {
+      "reason": "1.5 behaviour: ORDER BY of a non-integer literal is accepted",
+      "paths": [
+        "test/sql/binder/order_by_view.test",
+        "test/sql/order/test_order_by_non_ordinal_literal.test"
+      ]
+    },
+    {
+      "reason": "1.5 behaviour: type modifiers must be constants",
+      "paths": [
+        "test/sql/types/decimal/test_decimal.test",
+        "test/sql/types/type_expression_roundtrip.test"
+      ]
+    },
+    {
+      "reason": "CREATE TEMPORARY SCHEMA (2.0 syntax)",
+      "paths": [
+        "test/sql/catalog/test_temporary.test",
+        "test/sql/catalog/test_temporary_schema.test"
+      ]
+    },
+    {
+      "reason": "syntax only the PEG grammar has (at or near \")\")",
+      "paths": [
+        "test/sql/aggregate/grouping_sets/grouping.test",
+        "test/sql/types/struct/test_tuple.test"
+      ]
+    },
+    {
+      "reason": "syntax only the PEG grammar has (at or near \"}\")",
+      "paths": [
+        "test/sql/types/nested/struct/struct_dict.test",
+        "test/sql/types/struct/empty_struct.test"
+      ]
+    },
+    {
+      "reason": "1.5 behaviour: OPERATOR(schema.op) resolves the schema as a function",
+      "paths": [
+        "test/sql/peg_parser/qualified_operator.test"
+      ]
+    },
+    {
+      "reason": "1.5 behaviour: PARTITION BY in a bare COPY option list is not supported",
+      "paths": [
+        "test/sql/copy/partitioned/partition_by_syntax.test"
+      ]
+    },
+    {
+      "reason": "1.5 behaviour: SHOW name describes a table only",
+      "paths": [
+        "test/sql/show_select/show_settings.test"
+      ]
+    },
+    {
+      "reason": "1.5 behaviour: no alias on a parenthesized join",
+      "paths": [
+        "test/sql/join/pair_dependent_full_outer_join_subquery_bindings.test"
+      ]
+    },
+    {
+      "reason": "1.5 grammar supports window clause chaining; 2.0 rejects it",
+      "paths": [
+        "test/sql/window/test_window_clause.test"
+      ]
+    },
+    {
+      "reason": "2.0 uppercase identifier mode is treated as preserve",
+      "paths": [
+        "test/sql/settings/setting_preserve_identifier_case.test"
+      ]
+    },
+    {
+      "reason": "COPY inside a CTE (2.0 capability)",
+      "paths": [
+        "test/sql/copy/copy_cte.test"
+      ]
+    },
+    {
+      "reason": "CREATE TEMPORARY INDEX (2.0 syntax)",
+      "paths": [
+        "test/sql/catalog/test_temporary_index.test"
+      ]
+    },
+    {
+      "reason": "CREATE VIEW WITH options (2.0 capability)",
+      "paths": [
+        "test/sql/catalog/view/deferred_binding.test"
+      ]
+    },
+    {
+      "reason": "JOIN BY (2.0 syntax)",
+      "paths": [
+        "test/sql/join/test_join_by.test"
+      ]
+    },
+    {
+      "reason": "OVERLAY (2.0 syntax)",
+      "paths": [
+        "test/sql/function/string/overlay.test"
+      ]
+    },
+    {
+      "reason": "SWITCH with non-constant keys (2.0 capability)",
+      "paths": [
+        "test/sql/parser/switch_case.test"
+      ]
+    },
+    {
+      "reason": "syntax only the PEG grammar has (at or near \".\")",
+      "paths": [
+        "test/sql/aggregate/aggregate_state_export/approx_top_k_export_state.test"
+      ]
+    },
+    {
+      "reason": "syntax only the PEG grammar has (at or near \"1\")",
+      "paths": [
+        "test/sql/peg_parser/expression_statement.test"
+      ]
+    },
+    {
+      "reason": "syntax only the PEG grammar has (at or near \";\")",
+      "paths": [
+        "test/sql/peg_parser/enable_peg_parser.test"
+      ]
+    },
+    {
+      "reason": "syntax only the PEG grammar has (at or near \"AS\")",
+      "paths": [
+        "test/sql/extensions/aliasing.test"
+      ]
+    },
+    {
+      "reason": "syntax only the PEG grammar has (at or near \"DESC\")",
+      "paths": [
+        "test/sql/copy/partitioned/partitioned_order_by.test"
+      ]
+    },
+    {
+      "reason": "syntax only the PEG grammar has (at or near \"GLOB\")",
+      "paths": [
+        "test/sql/optimizer/test_glob_row_group_pruning.test"
+      ]
+    },
+    {
+      "reason": "syntax only the PEG grammar has (at or near \"IMMEDIATE\")",
+      "paths": [
+        "test/sql/constraints/deferred/test_constraint_timing_persistence.test"
+      ]
+    },
+    {
+      "reason": "syntax only the PEG grammar has (at or near \"INTEGER\")",
+      "paths": [
+        "test/sql/types/type_literal.test"
+      ]
+    },
+    {
+      "reason": "syntax only the PEG grammar has (at or near \"connection\")",
+      "paths": [
+        "test/sql/secrets/connection_secret_storage.test"
+      ]
+    },
+    {
+      "reason": "syntax only the PEG grammar has (at or near \"default\")",
+      "paths": [
+        "test/sql/explain/explain_formats.test"
+      ]
+    },
+    {
+      "reason": "syntax only the PEG grammar has (at or near \"quack\")",
+      "paths": [
+        "test/sql/extensions/load_use_extension_one_query.test"
+      ]
+    },
+    {
+      "reason": "syntax only the PEG grammar has (at or near \"text\")",
+      "paths": [
+        "test/sql/types/test_qualified_type_cast.test"
+      ]
+    },
+    {
+      "reason": "syntax only the PEG grammar has (at or near \"values\")",
+      "paths": [
+        "test/sql/cte/recursive_cte_aoc2022.test_slow"
+      ]
+    }
+  ]
 }

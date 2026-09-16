@@ -1,6 +1,144 @@
 {
   "description": "legacy_parser loaded with the 1.5 grammar as primary parser and PEG as fallback.",
-  "statically_loaded_extensions": ["core_functions", "legacy_parser"],
+  "statically_loaded_extensions": [
+    "core_functions",
+    "legacy_parser"
+  ],
   "on_init": "SET allow_parser_override_extension='fallback'",
-  "skip_compiled": "true"
+  "skip_compiled": "true",
+  "skip_tests": [
+    {
+      "reason": "error wording differs",
+      "paths": [
+        "test/sql/catalog/comment_on_extended.test",
+        "test/sql/error/error_location_multicaret.test",
+        "test/sql/export/export_database.test",
+        "test/sql/function/timetz/test_date_part.test",
+        "test/sql/parser/values_list_error.test",
+        "test/sql/peg_parser/fuzzer/diverge_0002.test",
+        "test/sql/peg_parser/fuzzer/diverge_0004.test",
+        "test/sql/peg_parser/fuzzer/internal_0206.test",
+        "test/sql/pivot/pivot_star.test"
+      ]
+    },
+    {
+      "reason": "nested schemas and four-part names (2.0 capability)",
+      "paths": [
+        "test/sql/attach/attach_enums.test",
+        "test/sql/catalog/nested_schema/deeply_nested_entries.test",
+        "test/sql/catalog/nested_schema/drop_nested_schema.test",
+        "test/sql/catalog/nested_schema/drop_nested_schema_persist.test",
+        "test/sql/catalog/nested_schema/nested_constraints.test",
+        "test/sql/catalog/nested_schema/nested_wal_replay.test",
+        "test/sql/projection/select_star_exclude.test"
+      ]
+    },
+    {
+      "reason": "ALTER TABLE ADD UNIQUE (2.0 capability)",
+      "paths": [
+        "test/sql/alter/add_pk/test_add_pk_wal_generated.test",
+        "test/sql/alter/add_unique/test_add_unique.test",
+        "test/sql/alter/add_unique/test_add_unique_wal.test",
+        "test/sql/constraints/deferred/test_constraint_timing_storage_version.test"
+      ]
+    },
+    {
+      "reason": "1.5 behaviour: type modifiers must be constants",
+      "paths": [
+        "test/sql/types/decimal/test_decimal.test",
+        "test/sql/types/struct/test_tuple.test",
+        "test/sql/types/type_expression_roundtrip.test"
+      ]
+    },
+    {
+      "reason": "1.5 behaviour: ~ is a full regex match",
+      "paths": [
+        "test/sql/function/string/regex_operators.test",
+        "test/sql/function/string/regex_operators_v1_5_view.test",
+        "test/sql/function/string/test_similar_to.test"
+      ]
+    },
+    {
+      "reason": "1.5 rendering: built-in functions are qualified with main.",
+      "paths": [
+        "test/sql/parser/literal_round_trip.test",
+        "test/sql/parser/test_columns_unpacked.test",
+        "test/sql/types/test_quotes.test"
+      ]
+    },
+    {
+      "reason": "1.5 behaviour: ADD COLUMN with constraints is rejected",
+      "paths": [
+        "test/sql/alter/add_col/test_add_col_constraints.test",
+        "test/sql/alter/add_col/test_add_col_not_null.test"
+      ]
+    },
+    {
+      "reason": "1.5 behaviour: ORDER BY of a non-integer literal is accepted",
+      "paths": [
+        "test/sql/binder/order_by_view.test",
+        "test/sql/order/test_order_by_non_ordinal_literal.test"
+      ]
+    },
+    {
+      "reason": "1.5 behaviour: OPERATOR(schema.op) resolves the schema as a function",
+      "paths": [
+        "test/sql/peg_parser/qualified_operator.test"
+      ]
+    },
+    {
+      "reason": "1.5 behaviour: PARTITION BY in a bare COPY option list is not supported",
+      "paths": [
+        "test/sql/copy/partitioned/partition_by_syntax.test"
+      ]
+    },
+    {
+      "reason": "1.5 behaviour: SHOW name describes a table only",
+      "paths": [
+        "test/sql/show_select/show_settings.test"
+      ]
+    },
+    {
+      "reason": "1.5 behaviour: no alias on a parenthesized join",
+      "paths": [
+        "test/sql/join/pair_dependent_full_outer_join_subquery_bindings.test"
+      ]
+    },
+    {
+      "reason": "1.5 grammar supports window clause chaining; 2.0 rejects it",
+      "paths": [
+        "test/sql/window/test_window_clause.test"
+      ]
+    },
+    {
+      "reason": "2.0 uppercase identifier mode is treated as preserve",
+      "paths": [
+        "test/sql/settings/setting_preserve_identifier_case.test"
+      ]
+    },
+    {
+      "reason": "COPY inside a CTE (2.0 capability)",
+      "paths": [
+        "test/sql/copy/copy_cte.test"
+      ]
+    },
+    {
+      "reason": "CREATE VIEW WITH options (2.0 capability)",
+      "paths": [
+        "test/sql/catalog/view/deferred_binding.test"
+      ]
+    },
+    {
+      "reason": "SWITCH with non-constant keys (2.0 capability)",
+      "paths": [
+        "test/sql/parser/switch_case.test"
+      ]
+    },
+    {
+      "reason": "plan shape differs, results do not",
+      "paths": [
+        "test/sql/optimizer/in_list_row_group_pruning.test"
+      ]
+    }
+  ]
 }
