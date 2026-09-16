@@ -1,5 +1,5 @@
 {
-  "description": "Strict: the legacy grammar must parse everything, no PEG fallback.",
-  "on_init": "SET allow_parser_override_extension='strict'",
+  "description": "Load legacy_parser: the 1.5 grammar is the parser, no PEG fallback (strict).",
+  "on_init": "LOAD legacy_parser",
   "skip_compiled": "true"
 }
