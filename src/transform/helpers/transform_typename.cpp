@@ -58,7 +58,10 @@ unique_ptr<ParsedExpression> Transformer::TransformTypeExpressionInternal(duckdb
 
 	// Parse type modifiers
 	vector<unique_ptr<ParsedExpression>> type_params;
-	for (auto typemod = type_name.typmods ? type_name.typmods->head : nullptr; typemod; typemod = typemod->next) {
+	// interval qualifiers (DAY TO SECOND, ...) are field masks in the Postgres grammar, not type parameters:
+	// the 2.0 parser casts to plain INTERVAL
+	auto typmods = known_type_id == LogicalTypeId::INTERVAL ? nullptr : type_name.typmods;
+	for (auto typemod = typmods ? typmods->head : nullptr; typemod; typemod = typemod->next) {
 		// Type mods are always a list of (name, node) pairs
 
 		string name_str;
