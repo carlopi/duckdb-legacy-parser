@@ -6,7 +6,7 @@ duckdb_unittest_tempdir/
 testext
 test/python/__pycache__/
 .Rhistory
-build.log
+build*.log
 legacy_*.log
 errors_full.txt
 .cache/
