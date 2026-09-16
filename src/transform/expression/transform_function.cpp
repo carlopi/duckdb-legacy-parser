@@ -189,7 +189,12 @@ unique_ptr<ParsedExpression> Transformer::TransformFuncCall(duckdb_libpgquery::P
 		}
 
 		for (auto &child : children) {
-			expr->GetArgumentsMutable().emplace_back(std::move(child));
+			if (!child->GetAlias().empty()) {
+				auto name = child->GetAlias();
+				expr->GetArgumentsMutable().emplace_back(std::move(name), std::move(child));
+			} else {
+				expr->GetArgumentsMutable().emplace_back(std::move(child));
+			}
 		}
 
 		auto window_spec = PGPointerCast<duckdb_libpgquery::PGWindowDef>(root.over);
@@ -323,8 +328,18 @@ unique_ptr<ParsedExpression> Transformer::TransformFuncCall(duckdb_libpgquery::P
 		return std::move(make_uniq<CastExpression>(LogicalType::DATE, std::move(children[0])));
 	}
 
+	// an aliased child is a named argument (name := value)
+	vector<FunctionArgument> arguments;
+	for (auto &child : children) {
+		if (!child->GetAlias().empty()) {
+			auto name = child->GetAlias();
+			arguments.emplace_back(std::move(name), std::move(child));
+		} else {
+			arguments.emplace_back(std::move(child));
+		}
+	}
 	auto function = make_uniq<FunctionExpression>(QualifiedName(Identifier(std::move(catalog)), Identifier(std::move(schema)), Identifier(lowercase_name)),
-	                                              std::move(children), std::move(filter_expr), std::move(order_bys),
+	                                              std::move(arguments), std::move(filter_expr), std::move(order_bys),
 	                                              root.agg_distinct, false, root.export_state);
 	SetQueryLocation(*function, root.location);
 
