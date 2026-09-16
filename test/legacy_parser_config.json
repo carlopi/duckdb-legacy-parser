@@ -1,0 +1,5 @@
+{
+  "description": "Run the sqllogictests with the 1.5 Postgres grammar as the primary parser (PEG as fallback).",
+  "on_init": "SET allow_parser_override_extension='fallback'",
+  "skip_compiled": "true"
+}

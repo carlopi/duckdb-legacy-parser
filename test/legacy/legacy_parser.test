@@ -1,0 +1,61 @@
+# name: test/legacy/legacy_parser.test
+# description: The 1.5 Postgres-derived parser, registered as a parser override
+# group: [legacy]
+
+require legacy_parser
+
+# not consulted unless the override setting enables it
+query I
+SELECT 42
+----
+42
+
+statement ok
+SET allow_parser_override_extension='fallback'
+
+# the legacy parser is now the primary parser
+query II
+WITH c AS (SELECT range AS i, range % 2 AS j FROM range(6)) SELECT j, sum(i) FROM c GROUP BY j ORDER BY j
+----
+0	6
+1	9
+
+# column naming follows the 1.5 parser
+query I
+SELECT [1, 2, 3][2]
+----
+2
+
+statement ok
+CREATE TABLE t(i INTEGER, j INTEGER)
+
+statement ok
+ALTER TABLE t ADD COLUMN k INTEGER DEFAULT 5
+
+query III
+INSERT INTO t VALUES (1, 2, 3) RETURNING *
+----
+1	2	3
+
+statement ok
+PREPARE p AS SELECT count(*) FROM t WHERE i = $1
+
+query I
+EXECUTE p(1)
+----
+1
+
+# a syntax error falls through to the PEG parser, which reports it
+statement error
+SELEC 1
+----
+Parser Error
+
+# in strict mode the legacy parser's own error is reported
+statement ok
+SET allow_parser_override_extension='strict'
+
+statement error
+SELEC 1
+----
+syntax error at or near "1"
