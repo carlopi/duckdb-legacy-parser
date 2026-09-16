@@ -1,5 +1,5 @@
 {
-  "description": "Load legacy_parser: the 1.5 grammar is the parser, no PEG fallback (strict).",
-  "on_init": "LOAD legacy_parser",
+  "description": "legacy_parser loaded: the 1.5 grammar is the parser, no PEG fallback (strict).",
+  "statically_loaded_extensions": ["legacy_parser"],
   "skip_compiled": "true"
 }
