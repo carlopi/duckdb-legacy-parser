@@ -18,7 +18,14 @@ unique_ptr<ParsedExpression> Transformer::TransformValue(duckdb_libpgquery::PGVa
 		return ConstantExpression::FromValue(Value::INTEGER((int32_t)val.val.ival));
 	case duckdb_libpgquery::T_PGBitString: {
 		string bit_string(val.val.str);
-		if (bit_string.empty() || bit_string[0] != 'x') {
+		if (bit_string.empty()) {
+			return ConstantExpression::FromValue(Value(string(val.val.str)));
+		}
+		if (bit_string[0] == 'b') {
+			// B'0101' bit-string literal: the grammar prefixes the digits with 'b'
+			return ConstantExpression::Bit(bit_string.substr(1));
+		}
+		if (bit_string[0] != 'x') {
 			return ConstantExpression::FromValue(Value(string(val.val.str)));
 		}
 		// X'...' hex literal: val.val.str = "xFF..." (lowercase 'x' prefix + hex digits)
