@@ -20,7 +20,8 @@ void Transformer::TransformCopyOptions(CopyInfo &info, optional_ptr<duckdb_libpg
 	// iterate over each option
 	for_each_cell(cell, options->head) {
 		auto def_elem = PGPointerCast<duckdb_libpgquery::PGDefElem>(cell->data.ptr_value);
-		Identifier name(def_elem->defname);
+		// option names are case-insensitive; lowercase them like the PEG parser does
+		Identifier name(StringUtil::Lower(def_elem->defname));
 		if (info.parsed_options.find(name) != info.parsed_options.end()) {
 			throw ParserException("Unexpected duplicate option \"%s\"", name.GetIdentifierName());
 		}
