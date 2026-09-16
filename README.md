@@ -49,8 +49,7 @@ These are 1.5 behaviour, confirmed against a 1.5.5 build, and stay as they are:
 - `ORDER BY true` is accepted; 2.0 rejects a non-integer literal.
 - `ALTER TABLE ... ADD COLUMN ... UNIQUE` and other column constraints on `ADD COLUMN` are
   rejected by the transformer.
-- `identifier_case_mode = 'uppercase'` is a 2.0 option; the legacy grammar lowercases or
-  preserves.
+- `identifier_case_mode = 'uppercase'` is a 2.0 option; the legacy grammar treats it as `preserve`.
 
 Syntax added to DuckDB after the grammar was frozen is rejected in strict mode and handed to the
 PEG parser in fallback mode. `CREATE TRIGGER`, temporary indexes and schemas, nested schemas,

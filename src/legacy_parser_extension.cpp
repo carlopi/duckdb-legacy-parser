@@ -52,7 +52,8 @@ static ParserOverrideResult LegacyParse(ParserExtensionInfo *info, const string 
 			query = std::move(stripped);
 		}
 	}
-	PostgresParser::SetPreserveIdentifierCase(options.identifier_case_mode == IdentifierCaseMode::PRESERVE_CASE);
+	// the 1.5 grammar can lowercase or preserve; the 2.0 uppercase mode is treated as preserve
+	PostgresParser::SetPreserveIdentifierCase(options.identifier_case_mode != IdentifierCaseMode::LOWERCASE);
 
 	vector<unique_ptr<SQLStatement>> statements;
 	string error_message;
