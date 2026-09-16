@@ -86,6 +86,7 @@ void *palloc(size_t n) {
 void pg_parser_init() {
 	pg_parser_state.pg_err_code = PGUNDEFINED;
 	pg_parser_state.pg_err_msg[0] = '\0';
+	pg_parser_state.pg_err_pos = 0;
 
 	pg_parser_state.malloc_ptr_size = 4;
 	auto new_malloc_ptrs = (char **) malloc(sizeof(char *) * pg_parser_state.malloc_ptr_size);
