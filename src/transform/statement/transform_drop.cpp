@@ -71,15 +71,17 @@ unique_ptr<SQLStatement> Transformer::TransformDrop(duckdb_libpgquery::PGDropStm
 
 	switch (stmt.removeType) {
 	case duckdb_libpgquery::PG_OBJECT_SCHEMA: {
+		// the dotted path as written ([schema] / [catalog, schema]); the binder resolves the leading component
 		auto view_list = PGPointerCast<duckdb_libpgquery::PGList>(stmt.objects->head->data.ptr_value);
-		if (view_list->length == 2) {
-			info.SetCatalog(PGPointerCast<duckdb_libpgquery::PGValue>(view_list->head->data.ptr_value)->val.str);
-			info.SetName(PGPointerCast<duckdb_libpgquery::PGValue>(view_list->head->next->data.ptr_value)->val.str);
-		} else if (view_list->length == 1) {
-			info.SetName(PGPointerCast<duckdb_libpgquery::PGValue>(view_list->head->data.ptr_value)->val.str);
-		} else {
+		if (view_list->length < 1 || view_list->length > 2) {
 			throw ParserException("Expected \"catalog.schema\" or \"schema\"");
 		}
+		vector<Identifier> schema_path;
+		for (auto cell = view_list->head; cell != view_list->tail; cell = cell->next) {
+			schema_path.emplace_back(PGPointerCast<duckdb_libpgquery::PGValue>(cell->data.ptr_value)->val.str);
+		}
+		Identifier schema_name(PGPointerCast<duckdb_libpgquery::PGValue>(view_list->tail->data.ptr_value)->val.str);
+		info.SetQualifiedName(QualifiedName(std::move(schema_path), std::move(schema_name)));
 		break;
 	}
 	case duckdb_libpgquery::PG_OBJECT_TRIGGER: {
