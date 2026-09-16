@@ -27,13 +27,10 @@ unique_ptr<ParsedExpression> Transformer::TransformArrayAccess(duckdb_libpgquery
 			children.push_back(std::move(result));
 
 			if (indices.is_slice) {
-				// If either the lower or upper bound is not specified, we use an empty constant LIST,
-				// which we handle in the execution.
-				auto constant_list = ConstantExpression::FromValue(Value::LIST(LogicalType::INTEGER, vector<Value>()));
-
-				auto lower = indices.lidx ? TransformExpression(indices.lidx) : constant_list->Copy();
+				// an unspecified lower or upper bound is the empty slice bound marker
+				auto lower = indices.lidx ? TransformExpression(indices.lidx) : OperatorExpression::EmptySliceBound();
 				children.push_back(std::move(lower));
-				auto upper = indices.uidx ? TransformExpression(indices.uidx) : constant_list->Copy();
+				auto upper = indices.uidx ? TransformExpression(indices.uidx) : OperatorExpression::EmptySliceBound();
 				children.push_back(std::move(upper));
 
 				if (indices.step) {
