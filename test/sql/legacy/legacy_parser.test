@@ -1,4 +1,4 @@
-# name: test/legacy/legacy_parser.test
+# name: test/sql/legacy/legacy_parser.test
 # description: The 1.5 Postgres-derived parser, registered as a parser override
 # group: [legacy]
 
