@@ -14,19 +14,21 @@ for a patch release.
 
 ```sql
 LOAD legacy_parser;                  -- nothing changes yet
-SET enable_legacy_parser = true;
+SET enable_legacy_parser = true;     -- also selects allow_parser_override_extension = 'strict'
 SELECT ...;                          -- parsed by the 1.5 grammar
 SET enable_legacy_parser = false;
 SELECT ...;                          -- built-in PEG parser
 ```
 
 `enable_legacy_parser` is the opt-in and defaults to `false`: until it is set, every query is
-handed to the built-in parser. It never changes the core setting.
+handed to the built-in parser. Loading the extension changes nothing by itself.
 
-Loading selects `allow_parser_override_extension = 'strict'`, so that once enabled the legacy
-grammar is the only parser and reports its own errors. Two other modes exist through that core
-setting:
+DuckDB only consults a parser override when the core setting `allow_parser_override_extension`
+is not `default`. Setting `enable_legacy_parser = true` therefore also moves that setting from
+`default` to `strict`: the legacy grammar is the only parser and reports its own errors. A mode
+you chose yourself is kept, and switching the opt-in off leaves the core setting as it is.
 
+- `strict`: the legacy grammar is the only parser.
 - `fallback`: the legacy grammar is tried first, and the PEG parser handles what it rejects.
 - `default`: the override is switched off, whatever `enable_legacy_parser` says.
 

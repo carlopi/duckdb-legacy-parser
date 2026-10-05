@@ -98,18 +98,25 @@ public:
 	}
 };
 
+//! Enabling moves the core setting off its default, where no parser override is consulted: "parse like 1.5" means
+//! the legacy grammar is the parser, without PEG fallback. An override mode that was chosen explicitly is kept.
+static void SetEnableLegacyParser(ClientContext &context, SetScope scope, Value &parameter) {
+	if (parameter.IsNull() || !BooleanValue::Get(parameter)) {
+		return;
+	}
+	auto &db = DatabaseInstance::GetDatabase(context);
+	if (Settings::Get<AllowParserOverrideExtensionSetting>(db) == AllowParserOverride::DEFAULT_OVERRIDE) {
+		DBConfig::GetConfig(db).SetOptionByName(Identifier("allow_parser_override_extension"), Value("strict"));
+	}
+}
+
 static void LoadInternal(ExtensionLoader &loader) {
 	auto &db = loader.GetDatabaseInstance();
 	auto &config = DBConfig::GetConfig(db);
 	ParserExtension::Register(config, LegacyParserExtensionHook(db));
 	config.AddExtensionOption(Identifier(ENABLE_OPTION),
 	                          "Makes the 1.5 grammar the parser; when unset every query goes to the built-in parser",
-	                          LogicalType::BOOLEAN, Value::BOOLEAN(false), nullptr, SetScope::GLOBAL);
-	// Once enabled this extension means "parse like 1.5": the legacy grammar is the parser, without PEG fallback,
-	// unless the override mode was chosen explicitly before the load
-	if (Settings::Get<AllowParserOverrideExtensionSetting>(db) == AllowParserOverride::DEFAULT_OVERRIDE) {
-		config.SetOptionByName(Identifier("allow_parser_override_extension"), Value("strict"));
-	}
+	                          LogicalType::BOOLEAN, Value::BOOLEAN(false), SetEnableLegacyParser, SetScope::GLOBAL);
 }
 
 void LegacyParserExtension::Load(ExtensionLoader &loader) {
