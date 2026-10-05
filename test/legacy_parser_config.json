@@ -1,10 +1,10 @@
 {
-  "description": "legacy_parser loaded with the 1.5 grammar as primary parser and PEG as fallback.",
+  "description": "legacy_parser enabled with the 1.5 grammar as primary parser and PEG as fallback.",
   "statically_loaded_extensions": [
     "core_functions",
     "legacy_parser"
   ],
-  "on_init": "SET allow_parser_override_extension='fallback'",
+  "on_init": "SET allow_parser_override_extension='fallback'; SET enable_legacy_parser=true;",
   "skip_compiled": "true",
   "skip_tests": [
     {

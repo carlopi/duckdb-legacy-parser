@@ -1,9 +1,10 @@
 {
-  "description": "legacy_parser loaded: the 1.5 grammar is the parser, no PEG fallback (strict).",
+  "description": "legacy_parser enabled: the 1.5 grammar is the parser, no PEG fallback (strict).",
   "statically_loaded_extensions": [
     "core_functions",
     "legacy_parser"
   ],
+  "on_init": "SET enable_legacy_parser=true;",
   "skip_compiled": "true",
   "skip_tests": [
     {

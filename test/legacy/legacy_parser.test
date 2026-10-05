@@ -4,7 +4,26 @@
 
 require legacy_parser
 
-# loading the extension selects strict mode: the legacy grammar is the parser
+# loading alone changes nothing: the built-in parser handles every query until the opt-in is set
+query I
+SELECT current_setting('enable_legacy_parser')
+----
+false
+
+query I
+1 + 1
+----
+2
+
+query I
+SELECT legacy_parser_stats()
+----
+parsed=0 declined=0
+
+# the opt-in: the legacy grammar is the parser, in strict mode
+statement ok
+SET enable_legacy_parser = true
+
 query I
 SELECT current_setting('allow_parser_override_extension')
 ----
@@ -63,9 +82,9 @@ statement error
 ----
 syntax error at or near "1"
 
-# the extension's own switch: off means the built-in parser, without touching the parser options
+# switching the opt-in off means the built-in parser again, without touching the parser options
 statement ok
-SET disable_legacy_parser = true
+SET enable_legacy_parser = false
 
 query I
 SELECT current_setting('allow_parser_override_extension')
@@ -83,7 +102,7 @@ SELECT legacy_parser_stats()
 parsed=11 declined=2
 
 statement ok
-SET disable_legacy_parser = false
+SET enable_legacy_parser = true
 
 statement error
 1 + 1

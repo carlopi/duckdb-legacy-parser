@@ -7,28 +7,28 @@ DuckDB 2.0 replaced the Postgres-derived parser with a PEG parser. This extensio
 commit that held both (duckdb `84dc4405aac`, plus the three parser fixes that landed on the
 v1.5 branch afterwards), and registers it through DuckDB's parser override hook.
 
-Load it when SQL that 1.5 accepted no longer parses, or parses differently, and you cannot wait
+Enable it when SQL that 1.5 accepted no longer parses, or parses differently, and you cannot wait
 for a patch release.
 
 ## Usage
 
 ```sql
-LOAD legacy_parser;                  -- the 1.5 grammar is now the parser
+LOAD legacy_parser;                  -- nothing changes yet
+SET enable_legacy_parser = true;
 SELECT ...;                          -- parsed by the 1.5 grammar
-SET disable_legacy_parser = true;
+SET enable_legacy_parser = false;
 SELECT ...;                          -- built-in PEG parser
-SET disable_legacy_parser = false;
-SELECT ...;                          -- the 1.5 grammar again
 ```
 
-Loading selects `allow_parser_override_extension = 'strict'`: the legacy grammar is the only
-parser and reports its own errors. Two other modes exist through that core setting:
+`enable_legacy_parser` is the opt-in and defaults to `false`: until it is set, every query is
+handed to the built-in parser. It never changes the core setting.
+
+Loading selects `allow_parser_override_extension = 'strict'`, so that once enabled the legacy
+grammar is the only parser and reports its own errors. Two other modes exist through that core
+setting:
 
 - `fallback`: the legacy grammar is tried first, and the PEG parser handles what it rejects.
-- `default`: the override is switched off.
-
-`disable_legacy_parser` is the extension's own switch. It never changes the core setting; when
-set, every query is handed to the built-in parser.
+- `default`: the override is switched off, whatever `enable_legacy_parser` says.
 
 Two rules follow from how DuckDB resolves the parser:
 

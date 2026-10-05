@@ -27,13 +27,13 @@ struct LegacyParserInfo : public ParserExtensionInfo {
 	DatabaseInstance &db;
 };
 
-static constexpr const char *DISABLE_OPTION = "disable_legacy_parser";
+static constexpr const char *ENABLE_OPTION = "enable_legacy_parser";
 
-//! The extension's own off switch: when set, every query is declined and the built-in parser handles it
-static bool LegacyParserDisabled(DatabaseInstance &db) {
+//! The extension's opt-in: unless set, every query is declined and the built-in parser handles it
+static bool LegacyParserEnabled(DatabaseInstance &db) {
 	Value value;
 	auto &config = DBConfig::GetConfig(db);
-	if (!config.TryGetCurrentSetting(Identifier(DISABLE_OPTION), value)) {
+	if (!config.TryGetCurrentSetting(Identifier(ENABLE_OPTION), value)) {
 		return false;
 	}
 	return !value.IsNull() && BooleanValue::Get(value);
@@ -42,7 +42,7 @@ static bool LegacyParserDisabled(DatabaseInstance &db) {
 //! Parses a query with the 1.5 Postgres-derived grammar and transformer.
 //! Returns DISPLAY_ORIGINAL_ERROR when the grammar rejects the query, so that the PEG parser takes over.
 static ParserOverrideResult LegacyParse(ParserExtensionInfo *info, const string &query_p, ParserOptions &options) {
-	if (LegacyParserDisabled(info->Cast<LegacyParserInfo>().db)) {
+	if (!LegacyParserEnabled(info->Cast<LegacyParserInfo>().db)) {
 		return ParserOverrideResult();
 	}
 	string query = query_p;
@@ -118,11 +118,10 @@ static void LoadInternal(ExtensionLoader &loader) {
 	auto &db = loader.GetDatabaseInstance();
 	auto &config = DBConfig::GetConfig(db);
 	ParserExtension::Register(config, LegacyParserExtensionHook(db));
-	config.AddExtensionOption(
-	    Identifier(DISABLE_OPTION),
-	    "Switches the legacy parser off without unloading it: every query goes to the built-in parser",
-	    LogicalType::BOOLEAN, Value::BOOLEAN(false), nullptr, SetScope::GLOBAL);
-	// Loading this extension means "parse like 1.5": make the legacy grammar the parser, without PEG fallback,
+	config.AddExtensionOption(Identifier(ENABLE_OPTION),
+	                          "Makes the 1.5 grammar the parser; when unset every query goes to the built-in parser",
+	                          LogicalType::BOOLEAN, Value::BOOLEAN(false), nullptr, SetScope::GLOBAL);
+	// Once enabled this extension means "parse like 1.5": the legacy grammar is the parser, without PEG fallback,
 	// unless the override mode was chosen explicitly before the load
 	if (Settings::Get<AllowParserOverrideExtensionSetting>(db) == AllowParserOverride::DEFAULT_OVERRIDE) {
 		config.SetOptionByName(Identifier("allow_parser_override_extension"), Value("strict"));
