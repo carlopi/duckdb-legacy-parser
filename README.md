@@ -36,9 +36,6 @@ Two rules follow from how DuckDB resolves the parser:
   not within the string that contains it.
 - Both settings are database-wide, not per connection.
 
-`legacy_parser_stats()` returns how many queries the legacy grammar parsed and how many it
-declined.
-
 ## Known divergences from DuckDB 2.0
 
 These are 1.5 behaviour, confirmed against a 1.5.5 build, and stay as they are:

@@ -11,15 +11,8 @@
 #include "duckdb/parser/statement/create_statement.hpp"
 #include "duckdb/parser/transformer.hpp"
 #include "postgres_parser.hpp"
-#include "duckdb/function/scalar_function.hpp"
-
-#include <atomic>
 
 namespace duckdb {
-
-//! Counters for the differential runs: how often the legacy grammar parsed a query, and how often it declined
-static std::atomic<idx_t> legacy_parsed_count {0};
-static std::atomic<idx_t> legacy_declined_count {0};
 
 struct LegacyParserInfo : public ParserExtensionInfo {
 	explicit LegacyParserInfo(DatabaseInstance &db_p) : db(db_p) {
@@ -72,7 +65,6 @@ static ParserOverrideResult LegacyParse(ParserExtensionInfo *info, const string 
 		}
 	}
 	if (!error_message.empty()) {
-		legacy_declined_count++;
 		if (options.parser_override_setting == AllowParserOverride::STRICT_OVERRIDE) {
 			auto exception = ParserException::SyntaxError(query, error_message, error_location);
 			return ParserOverrideResult(exception);
@@ -95,15 +87,7 @@ static ParserOverrideResult LegacyParse(ParserExtensionInfo *info, const string 
 			}
 		}
 	}
-	legacy_parsed_count++;
 	return ParserOverrideResult(std::move(statements));
-}
-
-static void LegacyParserStats(DataChunk &args, ExpressionState &state, Vector &result) {
-	auto text =
-	    StringUtil::Format("parsed=%llu declined=%llu", legacy_parsed_count.load(), legacy_declined_count.load());
-	result.SetValue(0, Value(text));
-	result.SetVectorType(VectorType::CONSTANT_VECTOR);
 }
 
 class LegacyParserExtensionHook : public ParserExtension {
@@ -126,7 +110,6 @@ static void LoadInternal(ExtensionLoader &loader) {
 	if (Settings::Get<AllowParserOverrideExtensionSetting>(db) == AllowParserOverride::DEFAULT_OVERRIDE) {
 		config.SetOptionByName(Identifier("allow_parser_override_extension"), Value("strict"));
 	}
-	loader.RegisterFunction(ScalarFunction("legacy_parser_stats", {}, LogicalType::VARCHAR, LegacyParserStats));
 }
 
 void LegacyParserExtension::Load(ExtensionLoader &loader) {
