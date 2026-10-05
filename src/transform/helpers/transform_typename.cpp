@@ -111,7 +111,9 @@ unique_ptr<ParsedExpression> Transformer::TransformTypeExpressionInternal(duckdb
 		}
 	}
 
-	auto result = make_uniq<TypeExpression>(QualifiedName(Identifier(catalog_name), Identifier(schema_name), Identifier(unbound_name)), std::move(type_params));
+	auto result = make_uniq<TypeExpression>(
+	    QualifiedName(Identifier(catalog_name), Identifier(schema_name), Identifier(unbound_name)),
+	    std::move(type_params));
 
 	// Assign query location
 	if (type_name.location >= 0) {

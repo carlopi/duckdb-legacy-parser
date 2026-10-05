@@ -61,27 +61,33 @@ void Transformer::TransformWindowFrame(duckdb_libpgquery::PGWindowDef &window_sp
 	if (window_spec.frameOptions & FRAMEOPTION_START_UNBOUNDED_PRECEDING) {
 		expr.WindowStartMutable() = WindowBoundary::UNBOUNDED_PRECEDING;
 	} else if (window_spec.frameOptions & FRAMEOPTION_START_OFFSET_PRECEDING) {
-		expr.WindowStartMutable() = TransformFrameOption(window_spec.frameOptions, WindowBoundary::EXPR_PRECEDING_ROWS,
-		                                  WindowBoundary::EXPR_PRECEDING_RANGE, WindowBoundary::EXPR_PRECEDING_GROUPS);
+		expr.WindowStartMutable() =
+		    TransformFrameOption(window_spec.frameOptions, WindowBoundary::EXPR_PRECEDING_ROWS,
+		                         WindowBoundary::EXPR_PRECEDING_RANGE, WindowBoundary::EXPR_PRECEDING_GROUPS);
 	} else if (window_spec.frameOptions & FRAMEOPTION_START_OFFSET_FOLLOWING) {
-		expr.WindowStartMutable() = TransformFrameOption(window_spec.frameOptions, WindowBoundary::EXPR_FOLLOWING_ROWS,
-		                                  WindowBoundary::EXPR_FOLLOWING_RANGE, WindowBoundary::EXPR_FOLLOWING_GROUPS);
+		expr.WindowStartMutable() =
+		    TransformFrameOption(window_spec.frameOptions, WindowBoundary::EXPR_FOLLOWING_ROWS,
+		                         WindowBoundary::EXPR_FOLLOWING_RANGE, WindowBoundary::EXPR_FOLLOWING_GROUPS);
 	} else if (window_spec.frameOptions & FRAMEOPTION_START_CURRENT_ROW) {
-		expr.WindowStartMutable() = TransformFrameOption(window_spec.frameOptions, WindowBoundary::CURRENT_ROW_ROWS,
-		                                  WindowBoundary::CURRENT_ROW_RANGE, WindowBoundary::CURRENT_ROW_GROUPS);
+		expr.WindowStartMutable() =
+		    TransformFrameOption(window_spec.frameOptions, WindowBoundary::CURRENT_ROW_ROWS,
+		                         WindowBoundary::CURRENT_ROW_RANGE, WindowBoundary::CURRENT_ROW_GROUPS);
 	}
 
 	if (window_spec.frameOptions & FRAMEOPTION_END_UNBOUNDED_FOLLOWING) {
 		expr.WindowEndMutable() = WindowBoundary::UNBOUNDED_FOLLOWING;
 	} else if (window_spec.frameOptions & FRAMEOPTION_END_OFFSET_PRECEDING) {
-		expr.WindowEndMutable() = TransformFrameOption(window_spec.frameOptions, WindowBoundary::EXPR_PRECEDING_ROWS,
-		                                WindowBoundary::EXPR_PRECEDING_RANGE, WindowBoundary::EXPR_PRECEDING_GROUPS);
+		expr.WindowEndMutable() =
+		    TransformFrameOption(window_spec.frameOptions, WindowBoundary::EXPR_PRECEDING_ROWS,
+		                         WindowBoundary::EXPR_PRECEDING_RANGE, WindowBoundary::EXPR_PRECEDING_GROUPS);
 	} else if (window_spec.frameOptions & FRAMEOPTION_END_OFFSET_FOLLOWING) {
-		expr.WindowEndMutable() = TransformFrameOption(window_spec.frameOptions, WindowBoundary::EXPR_FOLLOWING_ROWS,
-		                                WindowBoundary::EXPR_FOLLOWING_RANGE, WindowBoundary::EXPR_FOLLOWING_GROUPS);
+		expr.WindowEndMutable() =
+		    TransformFrameOption(window_spec.frameOptions, WindowBoundary::EXPR_FOLLOWING_ROWS,
+		                         WindowBoundary::EXPR_FOLLOWING_RANGE, WindowBoundary::EXPR_FOLLOWING_GROUPS);
 	} else if (window_spec.frameOptions & FRAMEOPTION_END_CURRENT_ROW) {
-		expr.WindowEndMutable() = TransformFrameOption(window_spec.frameOptions, WindowBoundary::CURRENT_ROW_ROWS,
-		                                WindowBoundary::CURRENT_ROW_RANGE, WindowBoundary::CURRENT_ROW_GROUPS);
+		expr.WindowEndMutable() =
+		    TransformFrameOption(window_spec.frameOptions, WindowBoundary::CURRENT_ROW_ROWS,
+		                         WindowBoundary::CURRENT_ROW_RANGE, WindowBoundary::CURRENT_ROW_GROUPS);
 	}
 
 	D_ASSERT(expr.start != WindowBoundary::INVALID && expr.end != WindowBoundary::INVALID);
@@ -338,9 +344,10 @@ unique_ptr<ParsedExpression> Transformer::TransformFuncCall(duckdb_libpgquery::P
 			arguments.emplace_back(std::move(child));
 		}
 	}
-	auto function = make_uniq<FunctionExpression>(QualifiedName(Identifier(std::move(catalog)), Identifier(std::move(schema)), Identifier(lowercase_name)),
-	                                              std::move(arguments), std::move(filter_expr), std::move(order_bys),
-	                                              root.agg_distinct, false, root.export_state);
+	auto function = make_uniq<FunctionExpression>(
+	    QualifiedName(Identifier(std::move(catalog)), Identifier(std::move(schema)), Identifier(lowercase_name)),
+	    std::move(arguments), std::move(filter_expr), std::move(order_bys), root.agg_distinct, false,
+	    root.export_state);
 	SetQueryLocation(*function, root.location);
 
 	return std::move(function);

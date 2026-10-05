@@ -11,8 +11,7 @@ import re
 import sys
 from collections import OrderedDict
 
-BLOCK = re.compile(
-    r'\n\d+\. (test/sql/[^\n:]+):(\d+)\n=+\n(.*?)\n=+\n(.*?)\n=+\n(.*?)\n-{20,}\n', re.S)
+BLOCK = re.compile(r'\n\d+\. (test/sql/[^\n:]+):(\d+)\n=+\n(.*?)\n=+\n(.*?)\n=+\n(.*?)\n-{20,}\n', re.S)
 FAIL_LINE = re.compile(r'^(test/sql/[A-Za-z0-9_/.-]+\.test(?:_slow)?):\d+', re.M)
 
 

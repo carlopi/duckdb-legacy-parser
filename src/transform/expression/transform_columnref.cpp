@@ -58,7 +58,8 @@ unique_ptr<ParsedExpression> Transformer::TransformStarExpression(duckdb_libpgqu
 			if (result->ReplaceListMutable().find(replace_entry) != result->ReplaceListMutable().end()) {
 				throw ParserException("Duplicate entry \"%s\" in REPLACE list", replace_entry);
 			}
-			if (result->ExcludeListMutable().find(QualifiedColumnName(Identifier(), replace_entry)) != result->ExcludeListMutable().end()) {
+			if (result->ExcludeListMutable().find(QualifiedColumnName(Identifier(), replace_entry)) !=
+			    result->ExcludeListMutable().end()) {
 				throw ParserException("Column \"%s\" cannot occur in both EXCLUDE and REPLACE list", replace_entry);
 			}
 			result->ReplaceListMutable().insert(make_pair(std::move(replace_entry), std::move(replace_expression)));

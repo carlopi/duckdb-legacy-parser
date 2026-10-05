@@ -96,7 +96,8 @@ unique_ptr<SQLStatement> Transformer::TransformDrop(duckdb_libpgquery::PGDropStm
 		if (view_list->length == 3) {
 			info.SetCatalog(PGPointerCast<duckdb_libpgquery::PGValue>(view_list->head->data.ptr_value)->val.str);
 			info.SetSchema(PGPointerCast<duckdb_libpgquery::PGValue>(view_list->head->next->data.ptr_value)->val.str);
-			info.SetName(PGPointerCast<duckdb_libpgquery::PGValue>(view_list->head->next->next->data.ptr_value)->val.str);
+			info.SetName(
+			    PGPointerCast<duckdb_libpgquery::PGValue>(view_list->head->next->next->data.ptr_value)->val.str);
 		} else if (view_list->length == 2) {
 			info.SetSchema(PGPointerCast<duckdb_libpgquery::PGValue>(view_list->head->data.ptr_value)->val.str);
 			info.SetName(PGPointerCast<duckdb_libpgquery::PGValue>(view_list->head->next->data.ptr_value)->val.str);

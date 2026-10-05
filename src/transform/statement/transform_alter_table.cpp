@@ -130,14 +130,15 @@ unique_ptr<SQLStatement> Transformer::TransformAlter(duckdb_libpgquery::PGAlterT
 				// default to an existing column
 				if (command->missing_ok || !column_entry.HasDefaultValue() ||
 				    column_entry.DefaultValue().GetExpressionClass() == ExpressionClass::CONSTANT) {
-					result->info =
-                                           make_uniq<AddColumnInfo>(std::move(data), std::move(column_entry), command->missing_ok, AddColumnConstraints());
+					result->info = make_uniq<AddColumnInfo>(std::move(data), std::move(column_entry),
+					                                        command->missing_ok, AddColumnConstraints());
 					break;
 				}
 				auto null_column = column_entry.Copy();
 				null_column.SetDefaultValue(ConstantExpression::Null());
 				return unique_ptr<SQLStatement>(std::move(TransformAndMaterializeAlter(
-                                   stmt, data, make_uniq<AddColumnInfo>(data, std::move(null_column), command->missing_ok, AddColumnConstraints()),
+				    stmt, data,
+				    make_uniq<AddColumnInfo>(data, std::move(null_column), command->missing_ok, AddColumnConstraints()),
 				    column_entry.GetName(), column_entry.DefaultValue().Copy())));
 
 			} else {
@@ -158,8 +159,8 @@ unique_ptr<SQLStatement> Transformer::TransformAlter(duckdb_libpgquery::PGAlterT
 				throw InternalException("Expected a name");
 			}
 			if (column_names.size() == 1) {
-				result->info =
-				    make_uniq<RemoveColumnInfo>(std::move(data), column_names[0].GetIdentifierName(), command->missing_ok, cascade);
+				result->info = make_uniq<RemoveColumnInfo>(std::move(data), column_names[0].GetIdentifierName(),
+				                                           command->missing_ok, cascade);
 			} else {
 				result->info =
 				    make_uniq<RemoveFieldInfo>(std::move(data), std::move(column_names), command->missing_ok, cascade);

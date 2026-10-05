@@ -59,7 +59,8 @@ unique_ptr<ParsedExpression> Transformer::TransformSubquery(duckdb_libpgquery::P
 			// ALL sublink is equivalent to NOT(ANY) with inverted comparison
 			// e.g. [= ALL()] is equivalent to [NOT(<> ANY())]
 			// first invert the comparison type
-			subquery_expr->GetComparisonTypeMutable() = NegateComparisonExpression(subquery_expr->GetComparisonTypeMutable());
+			subquery_expr->GetComparisonTypeMutable() =
+			    NegateComparisonExpression(subquery_expr->GetComparisonTypeMutable());
 			return make_uniq<OperatorExpression>(ExpressionType::OPERATOR_NOT, std::move(subquery_expr));
 		}
 		break;
@@ -117,7 +118,8 @@ unique_ptr<ParsedExpression> Transformer::TransformSubquery(duckdb_libpgquery::P
 				if (order.expression->GetExpressionType() == ExpressionType::VALUE_CONSTANT) {
 					auto &constant_expr = order.expression->Cast<ConstantExpression>();
 					string error;
-					auto bigint_value = constant_expr.GetLiteral().ToValue().DefaultTryCastAs(LogicalType::BIGINT, &error);
+					auto bigint_value =
+					    constant_expr.GetLiteral().ToValue().DefaultTryCastAs(LogicalType::BIGINT, &error);
 					if (bigint_value) {
 						int64_t order_index = BigIntValue::Get(*bigint_value);
 						idx_t positional_index = order_index < 0 ? NumericLimits<idx_t>::Maximum() : idx_t(order_index);

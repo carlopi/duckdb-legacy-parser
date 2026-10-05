@@ -22,7 +22,8 @@ vector<unique_ptr<ParsedExpression>> Transformer::TransformIndexParameters(duckd
 
 		if (index_element->name) {
 			// create a column reference expression
-			expressions.push_back(make_uniq<ColumnRefExpression>(Identifier(index_element->name), Identifier(relation_name)));
+			expressions.push_back(
+			    make_uniq<ColumnRefExpression>(Identifier(index_element->name), Identifier(relation_name)));
 		} else {
 			// parse the index expression
 			D_ASSERT(index_element->expr);

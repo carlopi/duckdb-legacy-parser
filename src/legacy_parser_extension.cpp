@@ -100,7 +100,8 @@ static ParserOverrideResult LegacyParse(ParserExtensionInfo *info, const string 
 }
 
 static void LegacyParserStats(DataChunk &args, ExpressionState &state, Vector &result) {
-	auto text = StringUtil::Format("parsed=%llu declined=%llu", legacy_parsed_count.load(), legacy_declined_count.load());
+	auto text =
+	    StringUtil::Format("parsed=%llu declined=%llu", legacy_parsed_count.load(), legacy_declined_count.load());
 	result.SetValue(0, Value(text));
 	result.SetVectorType(VectorType::CONSTANT_VECTOR);
 }
@@ -117,9 +118,10 @@ static void LoadInternal(ExtensionLoader &loader) {
 	auto &db = loader.GetDatabaseInstance();
 	auto &config = DBConfig::GetConfig(db);
 	ParserExtension::Register(config, LegacyParserExtensionHook(db));
-	config.AddExtensionOption(Identifier(DISABLE_OPTION),
-	                          "Switches the legacy parser off without unloading it: every query goes to the built-in parser",
-	                          LogicalType::BOOLEAN, Value::BOOLEAN(false), nullptr, SetScope::GLOBAL);
+	config.AddExtensionOption(
+	    Identifier(DISABLE_OPTION),
+	    "Switches the legacy parser off without unloading it: every query goes to the built-in parser",
+	    LogicalType::BOOLEAN, Value::BOOLEAN(false), nullptr, SetScope::GLOBAL);
 	// Loading this extension means "parse like 1.5": make the legacy grammar the parser, without PEG fallback,
 	// unless the override mode was chosen explicitly before the load
 	if (Settings::Get<AllowParserOverrideExtensionSetting>(db) == AllowParserOverride::DEFAULT_OVERRIDE) {
