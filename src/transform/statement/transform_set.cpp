@@ -60,7 +60,7 @@ unique_ptr<SetStatement> Transformer::TransformSetVariable(duckdb_libpgquery::PG
 		} else {
 			val = Value(expr->ToString());
 		}
-		expr = ConstantExpression::FromValue(std::move(val));
+		expr = ConstantExpression::FromValue(val);
 	}
 	if (expr->GetExpressionType() == ExpressionType::VALUE_DEFAULT) {
 		// set to default = reset

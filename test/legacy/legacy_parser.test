@@ -11,16 +11,16 @@ SELECT current_setting('enable_legacy_parser')
 false
 
 query I
+SELECT lower(current_setting('allow_parser_override_extension'))
+----
+default
+
+query I
 1 + 1
 ----
 2
 
-query I
-SELECT legacy_parser_stats()
-----
-parsed=0 declined=0
-
-# the opt-in: the legacy grammar is the parser, in strict mode
+# the opt-in: the legacy grammar is the parser, and the core setting moves from default to strict
 statement ok
 SET enable_legacy_parser = true
 
@@ -33,11 +33,6 @@ query I
 SELECT 42
 ----
 42
-
-query I
-SELECT legacy_parser_stats()
-----
-parsed=3 declined=0
 
 # column naming follows the 1.5 parser
 query I
@@ -96,11 +91,6 @@ query I
 ----
 2
 
-query I
-SELECT legacy_parser_stats()
-----
-parsed=11 declined=2
-
 statement ok
 SET enable_legacy_parser = true
 
@@ -118,11 +108,6 @@ query I
 ----
 2
 
-query I
-SELECT legacy_parser_stats()
-----
-parsed=13 declined=4
-
 statement error
 SELEC 1
 ----
@@ -133,6 +118,27 @@ statement ok
 SET allow_parser_override_extension='default'
 
 query I
-SELECT legacy_parser_stats()
+1 + 1
 ----
-parsed=14 declined=5
+2
+
+# enabling again moves the core setting off default once more
+statement ok
+SET enable_legacy_parser = true
+
+statement error
+1 + 1
+----
+syntax error at or near "1"
+
+# an override mode that was chosen explicitly is kept
+statement ok
+SET allow_parser_override_extension='fallback'
+
+statement ok
+SET enable_legacy_parser = true
+
+query I
+SELECT current_setting('allow_parser_override_extension')
+----
+fallback

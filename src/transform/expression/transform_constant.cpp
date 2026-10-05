@@ -113,7 +113,7 @@ unique_ptr<ParsedExpression> Transformer::TransformValue(duckdb_libpgquery::PGVa
 				// we can cast the value as a decimal
 				Value val = Value(str_val);
 				val = val.DefaultCastAs(LogicalType::DECIMAL(width, scale));
-				return ConstantExpression::FromValue(std::move(val));
+				return ConstantExpression::FromValue(val);
 			}
 		}
 		// if there is a decimal or the value is too big to cast as either hugeint or bigint
