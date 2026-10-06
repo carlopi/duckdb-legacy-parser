@@ -79,7 +79,8 @@ unique_ptr<MultiStatement> TransformAndMaterializeAlter(const duckdb_libpgquery:
 
 	// 3. `ALTER TABLE t ALTER u SET DEFAULT <expression>;`
 	// Reinstate the original default expression.
-	AddToMultiStatement(multi_statement, make_uniq<SetDefaultInfo>(data, column_name, std::move(expression)));
+	AddToMultiStatement(multi_statement,
+	                    make_uniq<SetDefaultInfo>(data, vector<Identifier> {column_name}, std::move(expression)));
 
 	return multi_statement;
 }
@@ -172,7 +173,8 @@ unique_ptr<SQLStatement> Transformer::TransformAlter(duckdb_libpgquery::PGAlterT
 			if (stmt.relkind != duckdb_libpgquery::PG_OBJECT_TABLE) {
 				throw ParserException("Alter column's default is only supported for tables");
 			}
-			result->info = make_uniq<SetDefaultInfo>(std::move(data), command->name, std::move(expr));
+			result->info = make_uniq<SetDefaultInfo>(std::move(data), vector<Identifier> {Identifier(command->name)},
+			                                         std::move(expr));
 			break;
 		}
 		case duckdb_libpgquery::PG_AT_AlterColumnType: {
@@ -194,16 +196,16 @@ unique_ptr<SQLStatement> Transformer::TransformAlter(duckdb_libpgquery::PGAlterT
 				auto col_ref = make_uniq<ColumnRefExpression>(command->name);
 				expr = make_uniq<CastExpression>(column_entry.Type(), std::move(col_ref));
 			}
-			result->info =
-			    make_uniq<ChangeColumnTypeInfo>(std::move(data), command->name, column_entry.Type(), std::move(expr));
+			result->info = make_uniq<ChangeColumnTypeInfo>(
+			    std::move(data), vector<Identifier> {Identifier(command->name)}, column_entry.Type(), std::move(expr));
 			break;
 		}
 		case duckdb_libpgquery::PG_AT_SetNotNull: {
-			result->info = make_uniq<SetNotNullInfo>(std::move(data), command->name);
+			result->info = make_uniq<SetNotNullInfo>(std::move(data), vector<Identifier> {Identifier(command->name)});
 			break;
 		}
 		case duckdb_libpgquery::PG_AT_DropNotNull: {
-			result->info = make_uniq<DropNotNullInfo>(std::move(data), command->name);
+			result->info = make_uniq<DropNotNullInfo>(std::move(data), vector<Identifier> {Identifier(command->name)});
 			break;
 		}
 		case duckdb_libpgquery::PG_AT_AddConstraint: {
