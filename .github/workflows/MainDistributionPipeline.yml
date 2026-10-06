@@ -19,11 +19,16 @@ jobs:
       ci_tools_version: main
       extension_name: legacy_parser
 
+  duckdb-submodule-version:
+    uses: duckdb/extension-ci-tools/.github/workflows/_submodule_version.yml@main
+
   code-quality-check:
     name: Code Quality Check
     uses: duckdb/extension-ci-tools/.github/workflows/_extension_code_quality.yml@main
+    needs:
+      - duckdb-submodule-version
     with:
-      duckdb_version: 4af9740da47e908b29efc52570de8ca2115ab6cb
+      duckdb_version: ${{ needs.duckdb-submodule-version.outputs.version }}
       ci_tools_version: main
       extension_name: legacy_parser
       format_checks: 'format;tidy'
