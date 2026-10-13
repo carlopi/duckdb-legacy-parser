@@ -151,7 +151,7 @@ unique_ptr<ParsedExpression> Transformer::TransformTypeExpression(duckdb_libpgqu
 					result = make_uniq<TypeExpression>(Identifier("list"), std::move(type_params));
 				} else {
 					// ARRAY type
-					type_params.push_back(ConstantExpression::FromValue(Value::BIGINT(int_node->val.ival)));
+					type_params.push_back(ConstantExpression::Integer(int_node->val.ival));
 					result = make_uniq<TypeExpression>(Identifier("array"), std::move(type_params));
 				}
 

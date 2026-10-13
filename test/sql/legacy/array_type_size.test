@@ -1,0 +1,29 @@
+# name: test/sql/legacy/array_type_size.test
+# description: Array type sizes print as plain numbers, so the SQL stored for views and macros parses again
+# group: [legacy]
+
+require legacy_parser
+
+statement ok
+SET enable_legacy_parser = true
+
+statement ok
+CREATE VIEW v AS SELECT CAST(NULL AS FLOAT[3]) AS a, CAST(NULL AS INTEGER[3][2]) AS b, CAST(NULL AS VARCHAR[]) AS c
+
+query I
+SELECT sql FROM duckdb_views() WHERE view_name = 'v'
+----
+CREATE VIEW v AS SELECT CAST(NULL AS FLOAT[3]) AS a, CAST(NULL AS INTEGER[3][2]) AS b, CAST(NULL AS VARCHAR[]) AS c;
+
+statement ok
+CREATE MACRO m(x) AS CAST(x AS DOUBLE[2])
+
+query I
+SELECT macro_definition FROM duckdb_functions() WHERE function_name = 'm'
+----
+CAST(x AS DOUBLE[2])
+
+query I
+SELECT m([1, 2])
+----
+[1.0, 2.0]
